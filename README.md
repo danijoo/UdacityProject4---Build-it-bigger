@@ -1,7 +1,7 @@
 # UdacityProject4: Build-it-bigger
 A demo app showing how multiple modules work together.
 
-<<<<<<< HEAD
+Base on https://github.com/udacity/ud867/tree/master/FinalProject
 
 # Origininal Readme
 
