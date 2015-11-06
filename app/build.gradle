@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    productFlavors {
+        free {
+            applicationId = "com.udacity.gradle.builditbigger.free"
+        }
+        paid {
+            applicationId = "com.udacity.gradle.builditbigger.pro"
+        }
+    }
     compileSdkVersion 23
     buildToolsVersion "22.0.1"
 
@@ -21,10 +29,9 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    // Added for AdMob
     compile project(':androidjokepresenter')
     compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.google.android.gms:play-services-ads:8.1.0'
+    freeCompile 'com.google.android.gms:play-services-ads:8.3.0'
     compile project(path: ':jokesbackend', configuration: 'android-endpoints')
     compile 'com.android.support:design:23.1.0'
 }
