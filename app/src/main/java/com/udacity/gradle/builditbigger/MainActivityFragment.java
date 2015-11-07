@@ -1,5 +1,6 @@
 package com.udacity.gradle.builditbigger;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -11,15 +12,17 @@ import android.view.ViewGroup;
 import net.headlezz.androidjokepresenter.JokePresenterActivity;
 import net.headlezz.jokesbackend.myApi.model.Joke;
 
-
 /**
  * A placeholder fragment containing a simple view.
  */
-public abstract class MainActivityFragment extends Fragment implements View.OnClickListener, JokeLoaderTask.JokeLoaderCallback {
+public abstract class MainActivityFragment extends Fragment implements View.OnClickListener {
 
     JokeLoaderTask mJokeLoaderTask;
 
-    public MainActivityFragment() {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        MyBus.getInstance().register(this);
     }
 
     @Override
@@ -27,6 +30,7 @@ public abstract class MainActivityFragment extends Fragment implements View.OnCl
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
         root.findViewById(R.id.btShowJoke).setOnClickListener(this);
+
         return root;
     }
 
@@ -35,30 +39,29 @@ public abstract class MainActivityFragment extends Fragment implements View.OnCl
         downloadNewJoke();
     }
 
+    /**
+     * starts the async task to download and show a new joke
+     * cancels old downloads if theres already a running one
+     */
     private void downloadNewJoke() {
-        mJokeLoaderTask = new JokeLoaderTask(this);
+        if(mJokeLoaderTask != null) {
+            mJokeLoaderTask.cancel(true);
+        }
+        mJokeLoaderTask = new JokeLoaderTask();
         mJokeLoaderTask.execute();
     }
 
-    @Override
-    public void onJokeLoaded(Joke joke) {
+    public void onEvent(Joke joke) {
         Intent i = new Intent(getContext(), JokePresenterActivity.class);
         i.putExtra(JokePresenterActivity.BUNDLE_ARG_JOKE, joke.getJoke());
         startActivity(i);
     }
 
-    @Override
-    public void onError() {
-        if (getView() != null)
-            Snackbar.make(getView(), R.string.joke_download_error, Snackbar.LENGTH_LONG)
+    public void onEvent(JokeLoaderTask.JokeDownloadException e) {
+        if (getActivity() != null)
+            Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.joke_download_error, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry, this)
                     .show();
     }
 
-    @Override
-    public void onStop() {
-        if(mJokeLoaderTask != null && !mJokeLoaderTask.isCancelled())
-            mJokeLoaderTask.cancel(true);
-        super.onStop();
-    }
 }

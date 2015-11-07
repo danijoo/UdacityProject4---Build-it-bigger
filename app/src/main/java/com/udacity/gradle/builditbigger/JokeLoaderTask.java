@@ -1,7 +1,7 @@
 package com.udacity.gradle.builditbigger;
 
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -15,18 +15,11 @@ import java.io.IOException;
 
 public class JokeLoaderTask extends AsyncTask<Void, Void, Joke>  {
 
+    public static final String TAG = JokeLoaderTask.class.getSimpleName();
     static final String ROOT_URL = "http://10.0.3.2:8080/_ah/api/";
     MyApi mApi;
 
-    JokeLoaderCallback mCallback;
-
-    interface JokeLoaderCallback {
-        void onJokeLoaded(Joke joke);
-        void onError();
-    }
-
-    public JokeLoaderTask(@NonNull JokeLoaderCallback cb) {
-        mCallback = cb;
+    public JokeLoaderTask() {
         mApi = new MyApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
                 .setRootUrl(ROOT_URL)
                 .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
@@ -39,6 +32,7 @@ public class JokeLoaderTask extends AsyncTask<Void, Void, Joke>  {
 
     @Override
     protected Joke doInBackground(Void... params) {
+        Log.d(TAG, "download started");
         try {
             return mApi.tellJoke().execute();
         } catch (IOException e) {
@@ -48,13 +42,20 @@ public class JokeLoaderTask extends AsyncTask<Void, Void, Joke>  {
 
     @Override
     protected void onPostExecute(Joke joke) {
-        if(isCancelled())
+        if(isCancelled()) {
+            Log.d(TAG, "download cancelled");
             return;
+        }
 
         if(joke != null) {
-            mCallback.onJokeLoaded(joke);
+            MyBus.getInstance().post(joke);
+            Log.d(TAG, "download finished");
         } else {
-            mCallback.onError();
+            MyBus.getInstance().post(new JokeDownloadException());
+            Log.d(TAG, "download finished with error");
         }
     }
+
+    static class JokeDownloadException extends Exception {}
+
 }
