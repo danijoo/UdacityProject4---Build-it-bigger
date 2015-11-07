@@ -2,8 +2,6 @@ package com.udacity.gradle.builditbigger;
 
 import android.test.AndroidTestCase;
 
-import com.google.common.eventbus.Subscribe;
-
 import net.headlezz.jokesbackend.myApi.model.Joke;
 
 public class JokeLoaderTaskTest extends AndroidTestCase {
@@ -20,15 +18,13 @@ public class JokeLoaderTaskTest extends AndroidTestCase {
 
     }
 
-    @Subscribe
-    public void onJokeLoaded(Joke joke) {
+    public void onEvent(Joke joke) {
         assertNotNull(joke);
         assertTrue(joke.getJoke() != null && !joke.getJoke().isEmpty());
         talker.doNotify();
     }
 
-    @Subscribe
-    public void onError() {
+    public void onEvent(JokeLoaderTask.JokeDownloadException e) {
         assertTrue(false);
         talker.doNotify();
     }
