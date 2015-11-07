@@ -17,3 +17,22 @@ allprojects {
         jcenter()
     }
 }
+
+
+
+task testAll {
+    evaluationDependsOn ":jokesbackend"
+
+    project(":jokesbackend"){
+        appengine{
+            daemon true
+        }
+    }
+
+    tasks.getByPath(':app:connectedAndroidTest').mustRunAfter ':jokesbackend:appengineRun'
+//    tasks.getByPath('jokesbackend:appengineStop').mustRunAfter ':app:connectedAndroidTest'
+
+    dependsOn ':jokesbackend:appengineRun'
+    dependsOn ':app:connectedAndroidTest'
+    finalizedBy ':jokesbackend:appengineStop'
+}

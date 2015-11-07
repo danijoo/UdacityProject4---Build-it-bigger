@@ -15,7 +15,6 @@ public class JokeLoaderTaskTest extends AndroidTestCase {
         task.execute();
         talker.doWait();
         MyBus.getInstance().unregister(this);
-
     }
 
     public void onEvent(Joke joke) {

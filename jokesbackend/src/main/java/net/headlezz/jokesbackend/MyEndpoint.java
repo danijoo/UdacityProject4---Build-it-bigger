@@ -32,7 +32,7 @@ public class MyEndpoint {
      * A simple endpoint method that takes a name and says Hi back
      */
     @ApiMethod(name = "tellJoke")
-    public Joke tellJoke () {
+    public Joke tellJoke () throws InterruptedException {
         return new Joke(jp.getRandomJoke());
     }
 
