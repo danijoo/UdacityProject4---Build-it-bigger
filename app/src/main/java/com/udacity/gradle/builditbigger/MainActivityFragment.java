@@ -43,7 +43,7 @@ public abstract class MainActivityFragment extends Fragment implements View.OnCl
      * starts the async task to download and show a new joke
      * cancels old downloads if theres already a running one
      */
-    private void downloadNewJoke() {
+    protected void downloadNewJoke() {
         mJokeLoaderTask = new JokeLoaderTask();
         mJokeLoaderTask.execute();
         DownloadDialogFragment frag = new DownloadDialogFragment();
@@ -55,6 +55,10 @@ public abstract class MainActivityFragment extends Fragment implements View.OnCl
      * @param joke Joke to show
      */
     public void onEvent(Joke joke) {
+        showJoke(joke);
+    }
+
+    public void showJoke(Joke joke) {
         Intent i = new Intent(getContext(), JokePresenterActivity.class);
         i.putExtra(JokePresenterActivity.BUNDLE_ARG_JOKE, joke.getJoke());
         startActivity(i);
