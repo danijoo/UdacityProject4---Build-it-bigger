@@ -44,19 +44,26 @@ public abstract class MainActivityFragment extends Fragment implements View.OnCl
      * cancels old downloads if theres already a running one
      */
     private void downloadNewJoke() {
-        if(mJokeLoaderTask != null) {
-            mJokeLoaderTask.cancel(true);
-        }
         mJokeLoaderTask = new JokeLoaderTask();
         mJokeLoaderTask.execute();
+        DownloadDialogFragment frag = new DownloadDialogFragment();
+        frag.show(getFragmentManager(), DownloadDialogFragment.TAG);
     }
 
+    /**
+     * Shows the joke activity with the given joke
+     * @param joke Joke to show
+     */
     public void onEvent(Joke joke) {
         Intent i = new Intent(getContext(), JokePresenterActivity.class);
         i.putExtra(JokePresenterActivity.BUNDLE_ARG_JOKE, joke.getJoke());
         startActivity(i);
     }
 
+    /**
+     * Prints an error message on the screen if we have a problem with the download
+     * @param e Exception
+     */
     public void onEvent(JokeLoaderTask.JokeDownloadException e) {
         if (getActivity() != null)
             Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.joke_download_error, Snackbar.LENGTH_LONG)
